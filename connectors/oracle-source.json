@@ -1,0 +1,23 @@
+{
+  "name": "oracle-source",
+  "config": {
+    "connector.class": "io.debezium.connector.oracle.OracleConnector",
+    "tasks.max": "1",
+  
+    "database.hostname": "oracle",
+    "database.port": "1521",
+    "database.user": "debezium",
+    "database.password": "password",
+    "database.dbname": "XE",
+    "database.pdb.name": "FREEPDB1",
+
+    "topic.prefix": "oracle", 
+
+    "schema.include.list": "DEMO",
+    "table.include.list": "DEMO.CUSTOMERS",
+  
+    "database.history.kafka.bootstrap.servers": "kafka:9092",
+    "database.history.kafka.topic": "oracle-history"
+  }
+}
+

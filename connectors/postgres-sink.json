@@ -1,0 +1,25 @@
+{
+  "name": "postgres-sink",
+  "config": {
+    "connector.class": "io.debezium.connector.jdbc.JdbcSinkConnector",
+    "tasks.max": "1",
+
+    "topics": "oracle.DEMO.CUSTOMERS",
+    
+    "connection.url": "jdbc:postgresql://postgres:5432/demo",
+    "connection.username": "postgres",
+    "connection.password": "password",
+
+    "dialect.name": "PostgresDatabaseDialect",
+    "collection.name.format": "customers",
+    
+    "auto.create": "true",
+    "insert.mode": "upsert",
+    
+    "primary.key.mode": "record_key",
+    "primary.key.fields": "ID",
+
+    "delete.enabled": "true" 
+  }
+}
+
