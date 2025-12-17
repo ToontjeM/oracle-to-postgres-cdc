@@ -1,13 +1,7 @@
 # Live streaming Oracle -> PostgreSQL
 
 ## Demo setup
-As usual you can provision the environment by using: `./00-privision.sh`. During provisioning the Oracle container log is shown. This is to make sure the database is running when the kafka ssource is created. Wait until you see the text:
-```
-#########################
-DATABASE IS READY TO USE!
-#########################
-```
-then press CTRL-C **ONCE** to continue.
+As usual you can provision the environment by using: `./00-provision.sh`. 
 
 This will create the following:
 
@@ -17,8 +11,8 @@ This will create the following:
 | kafka | 9092 | | | |
 | connect | 8083 | | | |
 | oracle | 1521 | | oracle | password |
-| | | debezium | password |
-| | | demo | demo |
+| | | | debezium | password |
+| | | | demo | demo |
 | postgres | 5432 | | postgres | password |
 
 On Oracle a database called `demo` is created:
@@ -29,14 +23,14 @@ CREATE TABLE demo.customers (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
-Then `00-provision.sh` continues and puts the database in ARCHIVE LOG mode using the script `setup_archivelog.sh`. The oracle logs are shown again, wait again until the database is ready and press CTRL-C again.
 
-Now the Oracle source and Postgres sink for Debezium will be created and checked.
+After everything is provisioned, wait at least 30 seconds to Kafka to create the topic. You can check if the topic is created by running: `docker exec -it kafka /kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic oracle.DEMO.CUSTOMERS --from-beginning`.
 
-After everything is provisioned, wait at least 30 seconds to Kafka to create the topic. You can ckec if the topic is created by running: `docker exec -it kafka /kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic oracle.DEMO.CUSTOMERS --from-beginning`.
 If you get the following message, then the topic is not created yet. Patience.
 ```
-[2025-12-17 12:58:11,664] WARN [Consumer clientId=console-consumer, groupId=console-consumer-40212] The metadata response from the cluster reported a recoverable issue with correlation id 2 : {oracle.DEMO.CUSTOMERS=LEADER_NOT_AVAILABLE} (org.apache.kafka.clients.NetworkClient)
+[2025-12-17 12:58:11,664] WARN [Consumer clientId=console-consumer, groupId=console-consumer-40212] 
+The metadata response from the cluster reported a recoverable issue with correlation id 2 : 
+{oracle.DEMO.CUSTOMERS=LEADER_NOT_AVAILABLE} (org.apache.kafka.clients.NetworkClient)
 ```
 When running the above command there should be no output unless a new record has been created in the Oracle `demo.customers` table.
 
@@ -46,4 +40,5 @@ When running the above command there should be no output unless a new record has
 - In the Oracle container, create a new record using `INSERT INTO customers VALUES (2, 'James', CURRENT_TIMESTAMP); COMMIT;`.
 - In the Postgres container, run the same query again. Notice that the record being replicated.
 
-
+## TODO
+- Ability to create and replicate new tables.
