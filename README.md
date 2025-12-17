@@ -5,7 +5,7 @@ As usual you can provision the environment by using: `./00-provision.sh`.
 
 This will create the following:
 
-![architecture](./images/arch.jpg)
+![architecture](arch.jpg)
 
 | Container | Port | Purpose | User | Password |
 | --- | --- | --- | --- | --- |
