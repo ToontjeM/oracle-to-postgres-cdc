@@ -1,39 +1,32 @@
--- ===========================================
--- Debezium CDC initialization for Oracle XE
--- ===========================================
+-- 1. Switch to Root to create the user
+ALTER SESSION SET CONTAINER=CDB$ROOT;
 
--- 1. Open the PDB and save state
-ALTER PLUGGABLE DATABASE FREEPDB1 OPEN;
-ALTER PLUGGABLE DATABASE FREEPDB1 SAVE STATE;
+-- 2. Create Common User
+CREATE USER c##debezium IDENTIFIED BY password CONTAINER=ALL;
 
--- 2. Switch to the PDB
-ALTER SESSION SET CONTAINER=FREEPDB1;
+-- 3. Grant Permissions
+GRANT CREATE SESSION TO c##debezium CONTAINER=ALL;
+GRANT SET CONTAINER TO c##debezium CONTAINER=ALL;
+GRANT SELECT ANY DICTIONARY TO c##debezium CONTAINER=ALL;
+GRANT SELECT ANY TRANSACTION TO c##debezium CONTAINER=ALL;
+GRANT CREATE TABLE TO c##debezium CONTAINER=ALL;
+GRANT UNLIMITED TABLESPACE TO c##debezium CONTAINER=ALL;
+GRANT FLASHBACK ANY TABLE TO c##debezium CONTAINER=ALL;
+GRANT LOGMINING TO c##debezium CONTAINER=ALL;
+GRANT EXECUTE ON DBMS_LOGMNR TO c##debezium CONTAINER=ALL;
+GRANT EXECUTE ON DBMS_LOGMNR_D TO c##debezium CONTAINER=ALL;
 
--- 3. Create Debezium user if it doesn't exist
-BEGIN
-   EXECUTE IMMEDIATE 'CREATE USER debezium IDENTIFIED BY password';
-EXCEPTION
-   WHEN OTHERS THEN
-      IF SQLCODE = -01920 THEN
-         NULL; -- user already exists, ignore
-      ELSE
-         RAISE;
-      END IF;
-END;
-/
+GRANT SELECT ANY TABLE TO c##debezium CONTAINER=ALL;      -- Fixes "0 columns" / "Not relational" error
+GRANT LOCK ANY TABLE TO c##debezium CONTAINER=ALL;        -- Fixes "ORA-01031" locking error
+GRANT SELECT_CATALOG_ROLE TO c##debezium CONTAINER=ALL;   -- Fixes "ORA-31603" metadata error
 
--- 4. Grant required privileges
-GRANT CREATE SESSION TO debezium;
-GRANT CONNECT, LOGMINING, SELECT_CATALOG_ROLE TO debezium;
+ALTER DATABASE ADD SUPPLEMENTAL LOG DATA (ALL) COLUMNS;
 
--- 5. Enable supplemental logging (required for CDC)
-ALTER DATABASE ADD SUPPLEMENTAL LOG DATA;
+-- 4. Switch to PDB to create Demo Data
+ALTER SESSION SET CONTAINER=XEPDB1;
 
-
--- Demo schema + table
 CREATE USER demo IDENTIFIED BY demo;
 GRANT CONNECT, RESOURCE TO demo;
-
 ALTER USER demo QUOTA UNLIMITED ON USERS;
 
 CREATE TABLE demo.customers (
@@ -41,7 +34,12 @@ CREATE TABLE demo.customers (
   name VARCHAR2(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 INSERT INTO demo.customers VALUES (1, 'Alice', CURRENT_TIMESTAMP);
 COMMIT;
+
+GRANT SELECT ON DEMO.CUSTOMERS TO c##debezium;
+GRANT FLASHBACK ON DEMO.CUSTOMERS TO c##debezium;
+GRANT SELECT ON SYS.DBA_OBJECTS TO c##debezium;
+GRANT SELECT_CATALOG_ROLE TO c##debezium;
+GRANT SELECT ANY DICTIONARY TO c##debezium;
 

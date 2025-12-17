@@ -3,21 +3,26 @@
   "config": {
     "connector.class": "io.debezium.connector.oracle.OracleConnector",
     "tasks.max": "1",
-  
     "database.hostname": "oracle",
     "database.port": "1521",
-    "database.user": "debezium",
+    "database.user": "c##debezium",
     "database.password": "password",
-    "database.dbname": "XE",
-    "database.pdb.name": "FREEPDB1",
-
-    "topic.prefix": "oracle", 
-
+    
+    "database.dbname": "XE",        
+    "database.pdb.name": "XEPDB1",  
+    
+    "topic.prefix": "oracle",
     "schema.include.list": "DEMO",
-    "table.include.list": "DEMO.CUSTOMERS",
-  
-    "database.history.kafka.bootstrap.servers": "kafka:9092",
-    "database.history.kafka.topic": "oracle-history"
+    "table.include.list": "DEMO\\..*",
+    "schema.history.internal.kafka.bootstrap.servers": "kafka:9092",
+    "schema.history.internal.kafka.topic": "oracle-history",
+
+    "decimal.handling.mode": "double",
+
+    "log.mining.strategy": "online_catalog",
+    "log.mining.sleep.time.min.ms": "0",
+    "log.mining.sleep.time.max.ms": "200",
+    "log.mining.batch.size.default": "1000",
+    "poll.interval.ms": "100"
   }
 }
-

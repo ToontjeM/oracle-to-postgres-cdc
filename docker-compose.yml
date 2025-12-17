@@ -1,11 +1,13 @@
 services:
   zookeeper:
     image: quay.io/debezium/zookeeper:3.1
+    container_name: zookeeper
     ports:
       - "2181:2181"
 
   kafka:
     image: quay.io/debezium/kafka:3.1
+    container_name: kafka
     depends_on:
       - zookeeper
     environment:
@@ -18,10 +20,13 @@ services:
 
   connect:
     image: quay.io/debezium/connect:3.1
+    container_name: debezium
     depends_on:
       - kafka
     ports:
       - "8083:8083"
+    volumes:
+      - ./drivers/ojdbc8.jar:/kafka/libs/ojdbc8.jar
     environment:
       BOOTSTRAP_SERVERS: kafka:9092
       GROUP_ID: "1"
@@ -30,11 +35,14 @@ services:
       STATUS_STORAGE_TOPIC: connect-status
       KEY_CONVERTER_SCHEMAS_ENABLE: "false"
       VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      TZ: UTC
 
   oracle:
-    image: gvenzl/oracle-free:latest
+    image: gvenzl/oracle-xe:21-faststart
+    container_name: oracle
     environment:
       ORACLE_PASSWORD: password
+      TZ: UTC
     ports:
       - "1521:1521"
     volumes:
@@ -42,6 +50,7 @@ services:
 
   postgres:
     image: postgres:16
+    container_name: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
