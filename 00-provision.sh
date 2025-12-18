@@ -6,7 +6,11 @@ sleep 5
 
 sh ./setup_archivelog.sh
 
-sleep 5
+echo "Waiting for Kafka Connect to start..."
+while [ $(curl -s -o /dev/null -w %{http_code} http://localhost:8083/) -ne 200 ] ; do 
+  echo -e "\tKafka Connect is unavailable (sleeping 5s)..."
+  sleep 5
+done
 
 curl -X POST -H "Content-Type: application/json" \
   --data @connectors/oracle-source.json \

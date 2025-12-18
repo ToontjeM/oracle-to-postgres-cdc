@@ -4,29 +4,31 @@
     "connector.class": "io.debezium.connector.jdbc.JdbcSinkConnector",
     "tasks.max": "1",
     "batch.size": "1",
+    "consumer.metadata.max.age.ms": "5000",
 
     "topics.regex": "oracle\\.DEMO\\..*",
-    "transforms": "unwrap,rename",
+
+    "transforms": "unwrap,rename,lowercase",
+
     "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "false",
+
     "transforms.rename.type": "org.apache.kafka.connect.transforms.RegexRouter",
     "transforms.rename.regex": ".*\\.(.*)",
     "transforms.rename.replacement": "$1",
-    
+
+    "transforms.lowercase.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.lowercase.regex": ".*",
+    "transforms.lowercase.replacement": "$0",
+    "transforms.lowercase.lowercase.output": "true",
+
     "connection.url": "jdbc:postgresql://postgres:5432/demo",
     "connection.username": "postgres",
     "connection.password": "password",
 
-    "dialect.name": "PostgresDatabaseDialect",
-    "collection.name.format": "customers",
-    
-    "auto.create": "true",
-    "auto.evolve": "true",
     "insert.mode": "upsert",
     "schema.evolution": "basic",
-
     "primary.key.mode": "record_key",
-    "primary.key.fields": "ID",
-
-    "delete.enabled": "true" 
+    "delete.enabled": "true"
   }
 }
