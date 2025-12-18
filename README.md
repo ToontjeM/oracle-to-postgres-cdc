@@ -45,7 +45,7 @@ When running the above command there should be no output unless a new record has
 - In the Postgres container, run `select * from customers;` If you want you can follow this up with a `\watch` because we will be using this for a while.
 - In the Oracle container, update the record using `update customers set name = 'Pepe' where id = 1;`and then `commit;`.
 - In the Postgres container, run `select * from customers;` again.
-- In the Oracle container, add a record using ìnser into customers values (2, 'Nancy');` and then `commit;`
+- In the Oracle container, add a record using `insert into customers values (2, 'Nancy');` and then `commit;`
 - In the Postgres container, run `select * from customers;` again.
 - In the Oracle container, run `delete from customers where id = 2;` and then `commit;`
 - In the Postgres container, run `select * from customers;` again.
@@ -63,4 +63,5 @@ Use `./99-deprovision.sh` to deprovision this demo.
 
 > [!WARNING]
 > Be carefull with `./99-deprovision.sh` because i do a `docker volume purge -f` which deletes all volumes from your docker environment.
+> 
 > I do this because i could not make `docker compose down -v` to delete the volumes properly.
